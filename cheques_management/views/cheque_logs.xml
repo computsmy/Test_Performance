@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="view_cheque_logs_form" model="ir.ui.view">
+        <field name="name">cheque.logs.form</field>
+        <field name="model">cheque.logs</field>
+        <field name="arch" type="xml">
+            <form duplicate="false">
+                <header>
+                    <button name="state_confirmed" type="object" string="Confirm" class="btn-primary" attrs="{'invisible':[('state','in',['confirmed','accepted','rejected','deposited','payment'])]}" confirm="Please make sure all informations are correct as you are not able to reverse this action."/>
+                    <button name="state_deposited" type="object" string="Deposit" class="btn-primary" attrs="{'invisible':[('state','in',['draft','accepted','rejected','deposited','payment'])]}"/>
+                    <button name="state_accepted" type="object" string="Accept" attrs="{'invisible':[('state','in',['draft','accepted','rejected','confirmed','payment'])]}"/>
+                    <button name="state_rejected" type="object" string="Reject" attrs="{'invisible':[('state','in',['draft','accepted','rejected','confirmed','payment'])]}"/>
+                    <button name="state_create_payment" type="object" string="Create Payment" class="btn-primary" attrs="{'invisible':[('payment_show_or_hide','=',False)]}"/>
+                    <button name="reset_to_draft" type="object" string="Reset to Draft" attrs="{'invisible':[('state','not in',['confirmed'])]}"/>
+                    <field widget="statusbar" options="{'clickable': False}" name="state" string="Status"
+                           statusbar_visible="draft,confirmed,deposited"/>
+                </header>
+                <sheet>
+                    <field name="payment_show_or_hide" invisible="1"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" required="0" placeholder="Number..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id" string="Customer" required="1" attrs="{'readonly':[('state','!=','draft')]}" options="{'no_create' : True}"/>
+                            <field name="journal_id" string="Journal" required="1" attrs="{'readonly':[('state','!=','draft')]}" domain="[('type','in',['bank','cash'])]" options="{'no_create' : True}"/>
+                            <field name="cheque_number" string="Cheque Number" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+                            <field name="cheque_amount" string="Amount" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        </group>
+                        <group>
+                            <field name="receive_date" string="Receiving Date" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+                            <field name="post_date" string="Post Date" required="1" attrs="{'readonly':[('state','!=','draft')]}"/>
+                            <field name="ref" string="Reference" attrs="{'readonly':[('state','!=','draft')]}"/>
+                            <field name="balance" string="Balance" readonly="1" />
+                            <field name="payment_id" string="Payment" readonly="1"/>
+
+                        </group>
+                    </group>
+                    <label for="trigger" class="btn-primary" style="border-radius: 4px;border: 1px solid #fff;padding: 3px 3px;color: #fff" attrs="{'invisible':[('state','=','draft')]}"/>
+                   <div style="position: absolute;height: 100px; width: 100px;right: -50px;top:-1000px;" >
+                            <field name="trigger" string="Refresh Invoice List" />
+                            </div>
+                    <field name="invoices" attrs="{'invisible':[('state','=','draft')]}">
+                        <tree readonly="1" create="0" delete="0" editable="0">
+                            <field name="name" attrs="{}" invisible="1"/>
+                            <field name="invoice" optional="show" attrs="{}" force_save="True" readonly="1"/>
+                            <field optional="show" name="amount_residual" string="Amount Due" readonly="1"/>
+                            <field optional="show" name="amount_to_apply" string="Amount to Apply" readonly="1"/>
+                            <field optional="show" name="allocated" string="Applied" readonly="1" sum="Sum of Applied"/>
+                            <field optional="show" name="eligible" string="Eligible" readonly="1" />
+                            <field optional="show" name="applied" string="Applied" invisible="1" readonly="1" />
+                            <field name="balance" string="Balance" invisible="1" readonly="1" />
+                            <field name="state" string="Status" invisible="1"/>
+                            <field name="allocate_different" string="Custom Amount" attrs="{'readonly':[('applied','=',True)]}"/>
+                            <button name="ApplyToInvoice" type="object" string="Apply" class="btn-primary" attrs="{'invisible':['|','|','|',('applied','=',True),('balance','=',0),('eligible','=',0),('state','in',['rejected','payment'])]}" /><!---->
+                            <button name="UnApplyToInvoice" type="object" string="Unapply" class="btn-primary" attrs="{'invisible':['|',('applied','=',False),('state','in',['rejected','payment'])]}" /><!-- -->
+                        </tree>
+                    </field>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                </div>
+            </form>
+
+        </field>
+    </record>
+    <record id="view_cheque_logs_tree" model="ir.ui.view">
+        <field name="name">cheque.logs.tree</field>
+        <field name="model">cheque.logs</field>
+        <field name="arch" type="xml">
+            <tree>
+               <field name="name"/>
+               <field name="cheque_number"/>
+               <field name="receive_date"/>
+               <field name="post_date"/>
+               <field name="cheque_amount" sum="Sum of Cheque Amount"/>
+               <field name="balance" sum="Sum of Balance"/>
+               <field name="state" widget="badge" decoration-info="state in ('confirmed','accepted','deposited')" decoration-success="state == 'payment'" decoration-danger="state == 'rejected'"/>
+            </tree>
+        </field>
+    </record>
+
+
+<!--    below are the menu item declaration-->
+    <record id="action_cheque_logs" model="ir.actions.act_window">
+        <field name="name">Cheque Logs</field>
+        <field name="res_model">cheque.logs</field>
+        <!--        <field name="inherit_id" ref="account.view_move_form"/>-->
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Start Adding Cheques!
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+            id="cheque_logs"
+            name="Cheque Logs"
+            action="action_cheque_logs"
+            parent="account.menu_finance_receivables"
+            sequence="999"
+    />
+
+
+</odoo>

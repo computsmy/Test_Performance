@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="sequence_cheque_logs" model="ir.sequence">
+            <field name="name">Cheque Logs Sequence</field>
+            <field name="code">cheque.seq</field>
+            <field name="prefix">CHQ/</field>
+            <field name="padding">3</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

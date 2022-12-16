@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record id="account_move_inherited_view" model="ir.ui.view">
+            <field name="name">account.move.view.form.inherit</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='edi_state']" position="after">
+                    <field name="cheques_allocation" widget="radio" options="{'horizontal':true}" readonly="1" attrs="{'invisible':[('cheques_allocation','=',False)]}"/>
+                </xpath>
+                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[4]" position="after">
+                    <page string="Cheques">
+                        <group>
+                        <field name="amount_to_apply" string="Balance to Allocate" force_save="1"/>
+                        </group>
+                        <field name="cheques" >
+                            <tree readonly="1" create="0" delete="0" editable="0">
+                                <field name="cheque_logs_id"/>
+                                <field name="allocated" sum="Sum of Allocated"/>
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

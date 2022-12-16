@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record id="account_reports.line_template" model="ir.action.client">
+            <field name=""></field>
+            <xpath expr="/t/t[1]" position="after">
+                <!--<t t-set="cheque_table" t-value="'position:fixed;padding-left:100px'" />-->
+                <t t-if="context.get('print_mode')">
+
+                    <t t-value="lines['lines'][0]" t-set="line"/>
+                    <t t-set="partner_id" t-value="line.get('partner_id')"/>
+
+                    <t>
+                        <table class="table o_report_block_table table-sm small"
+                               style="margin:50px;text-align:center;border-top: none">
+                            <tr>
+                                <th colspan="12" style="font-size:30px">Post Dated Cheque Received</th>
+                            </tr>
+                            <tr>
+                                <th>Date</th>
+                                <th>Cheque Number</th>
+                                <th>Amount</th>
+                                <th>Balance</th>
+                            </tr>
+                            <t t-value="0" t-set="prev"/>
+                            <t t-foreach="request.env['x_cheque_logs'].search([('x_studio_partner','=',partner_id),('x_studio_status','!=','payment')])"
+                               t-as="cheque">
+                                <tr>
+                                    <t t-set="prev" t-value="prev + cheque.x_studio_amount"/>
+                                    <td>
+                                        <t t-esc="cheque.x_studio_receiving_date"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="cheque.x_studio_cheque_number"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="cheque.x_studio_amount"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="prev"/>
+                                    </td>
+
+                                </tr>
+                            </t>
+                        </table>
+
+                    </t>
+                    <!--</t>-->
+                </t>
+            </xpath>
+        </record>
+    </data>
+</odoo>

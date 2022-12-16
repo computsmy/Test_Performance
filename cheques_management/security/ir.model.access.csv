@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+cheques_management.access_cheque_logs,access_cheque_logs,cheques_management.model_cheque_logs,base.group_user,1,1,1,1
+cheques_management.access_cheque_logs_line,access_cheque_logs_line,cheques_management.model_cheque_logs_line,base.group_user,1,1,1,1
